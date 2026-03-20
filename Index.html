@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>What If I Held?</title>
+<style>
+:root{
+  --bg:#07090f;
+  --surface:#0d1220;
+  --surface2:#111827;
+  --border:#1c2640;
+  --border2:#243050;
+  --accent:#00c896;
+  --accent2:#00a07a;
+  --red:#ff4d6d;
+  --red-bg:rgba(255,77,109,.07);
+  --red-border:rgba(255,77,109,.2);
+  --green:#00c896;
+  --green-bg:rgba(0,200,150,.07);
+  --green-border:rgba(0,200,150,.2);
+  --purple:#a78bfa;
+  --purple-bg:rgba(167,139,250,.07);
+  --purple-border:rgba(167,139,250,.2);
+  --blue:#38bdf8;
+  --blue-bg:rgba(56,189,248,.07);
+  --blue-border:rgba(56,189,248,.2);
+  --amber:#fbbf24;
+  --text:#e8edf5;
+  --muted:#566380;
+  --muted2:#8896b0;
+  --radius:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;min-height:100vh;font-size:14px}
+
+/* ── NAV ── */
+nav{background:rgba(13,18,32,.95);border-bottom:1px solid var(--border);padding:0 28px;height:58px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px)}
+.nav-logo{display:flex;align-items:center;gap:9px}
+.logo-mark{width:30px;height:30px;background:linear-gradient(135deg,var(--accent),#0090ff);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.logo-mark svg{width:17px;height:17px;fill:none;stroke:#fff;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+nav h1{font-size:1rem;font-weight:700;color:#fff;letter-spacing:-.01em}
+.nav-chip{font-size:.68rem;color:var(--muted);border:1px solid var(--border2);border-radius:999px;padding:2px 10px;background:var(--surface)}
+#resetBtn{margin-left:auto;font-size:.75rem;color:var(--muted2);border:1px solid var(--border2);border-radius:8px;padding:5px 14px;background:transparent;cursor:pointer;display:none;transition:all .15s;display:none}
+#resetBtn:hover{color:#fff;border-color:#4a5568;background:var(--surface2)}
+
+/* ── MAIN ── */
+main{max-width:1200px;margin:0 auto;padding:40px 24px}
+
+/* ── HERO ── */
+.hero{text-align:center;margin-bottom:40px}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:.72rem;color:var(--accent);border:1px solid var(--green-border);border-radius:999px;padding:3px 12px;background:var(--green-bg);margin-bottom:14px}
+.hero-eyebrow svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:2.5}
+.hero h2{font-size:2rem;font-weight:800;color:#fff;letter-spacing:-.03em;margin-bottom:10px;line-height:1.2}
+.hero h2 span{background:linear-gradient(90deg,var(--accent),#0090ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{color:var(--muted2);max-width:460px;margin:0 auto;line-height:1.6;font-size:.9rem}
+
+/* ── UPLOAD CARD ── */
+.upload-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:14px}
+.section-label{font-size:.7rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.section-label svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2.2}
+
+/* Current FY box */
+.cur-fy-zone{border:1.5px dashed rgba(0,200,150,.3);border-radius:var(--radius);padding:22px;text-align:center;cursor:pointer;transition:all .2s;background:linear-gradient(135deg,rgba(0,200,150,.03),transparent);position:relative}
+.cur-fy-zone:hover,.cur-fy-zone.drag{border-color:var(--accent);background:rgba(0,200,150,.05)}
+.cur-fy-zone.has{border-style:solid;border-color:var(--accent);background:rgba(0,200,150,.06)}
+.cur-fy-zone input{display:none}
+.upload-icon{width:40px;height:40px;border-radius:10px;background:rgba(0,200,150,.1);border:1px solid rgba(0,200,150,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 10px}
+.upload-icon svg{width:18px;height:18px;fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.cur-fy-zone h4{font-size:.9rem;font-weight:600;color:#fff;margin-bottom:4px}
+.cur-fy-zone p{font-size:.78rem;color:var(--muted)}
+.fy-tag{display:inline-block;background:rgba(0,200,150,.12);color:var(--accent);border:1px solid rgba(0,200,150,.25);border-radius:6px;padding:2px 9px;font-size:.7rem;font-weight:600;margin-bottom:8px}
+
+/* Past FY grid */
+.fy-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.fy-card{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 8px;text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.fy-card::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,200,150,.04),transparent);opacity:0;transition:opacity .2s}
+.fy-card:hover::before,.fy-card.uploaded::before{opacity:1}
+.fy-card:hover{border-color:var(--border2)}
+.fy-card.uploaded{border-color:rgba(0,200,150,.35)}
+.fy-card input{display:none}
+.fy-year{font-size:.78rem;font-weight:600;color:var(--text)}
+.fy-status{font-size:.64rem;color:var(--muted);margin-top:3px}
+.fy-card.uploaded .fy-status{color:var(--accent)}
+.fy-rm{position:absolute;top:3px;right:4px;background:none;border:none;color:var(--red);font-size:.75rem;cursor:pointer;display:none;opacity:.7;line-height:1}
+.fy-rm:hover{opacity:1}
+.fy-card.uploaded .fy-rm{display:block}
+
+/* Chips */
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:3px 10px;font-size:.72rem;color:var(--muted2)}
+.chip strong{color:var(--text)}
+
+/* Error */
+#errorBox{display:none;background:rgba(255,77,109,.08);border:1px solid var(--red-border);border-radius:10px;padding:12px 16px;margin-bottom:14px;color:#ff8fa3;font-size:.82rem;display:flex;align-items:center;gap:8px}
+
+/* Analyse btn */
+#analyseBtn{width:100%;padding:14px;border-radius:var(--radius);border:none;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s;margin-top:6px;letter-spacing:.01em}
+#analyseBtn.ready{background:linear-gradient(135deg,var(--accent),#00a07a);color:#fff;box-shadow:0 4px 24px rgba(0,200,150,.2)}
+#analyseBtn.ready:hover{box-shadow:0 6px 32px rgba(0,200,150,.3);transform:translateY(-1px)}
+#analyseBtn.disabled{background:var(--surface2);color:var(--muted);cursor:not-allowed}
+
+/* ── LOADING ── */
+#loadingScreen{display:none;flex-direction:column;align-items:center;justify-content:center;padding:80px 0;gap:18px}
+.spin-wrap{position:relative;width:56px;height:56px}
+.spin-bg{position:absolute;inset:0;border-radius:50%;border:3px solid var(--border2)}
+.spin-ring{position:absolute;inset:0;border-radius:50%;border:3px solid transparent;border-top-color:var(--accent);animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#loadingScreen h3{color:#fff;font-size:1rem;font-weight:600}
+#loadingScreen p{color:var(--muted);font-size:.82rem;margin-top:-10px;text-align:center;max-width:260px;line-height:1.5}
+
+/* ── DASHBOARD ── */
+#dashboard{display:none}
+
+/* Insight bar */
+.insight-bar{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.insight{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;display:flex;align-items:center;gap:12px}
+.insight-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.insight-icon svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.insight-icon.red{background:var(--red-bg);border:1px solid var(--red-border);color:var(--red)}
+.insight-icon.green{background:var(--green-bg);border:1px solid var(--green-border);color:var(--green)}
+.insight-label{font-size:.7rem;color:var(--muted);margin-bottom:2px}
+.insight-val{font-size:.88rem;font-weight:700;color:#fff}
+.insight-sub{font-size:.68rem;color:var(--muted)}
+
+/* Summary cards */
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px 20px;position:relative;overflow:hidden;transition:border-color .2s}
+.card::after{content:"";position:absolute;top:0;left:0;right:0;height:2px}
+.card.red::after{background:linear-gradient(90deg,var(--red),transparent)}
+.card.green::after{background:linear-gradient(90deg,var(--green),transparent)}
+.card.purple::after{background:linear-gradient(90deg,var(--purple),transparent)}
+.card.blue::after{background:linear-gradient(90deg,var(--blue),transparent)}
+.card-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+.card-icon svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.card.red .card-icon{background:var(--red-bg);border:1px solid var(--red-border);color:var(--red)}
+.card.green .card-icon{background:var(--green-bg);border:1px solid var(--green-border);color:var(--green)}
+.card.purple .card-icon{background:var(--purple-bg);border:1px solid var(--purple-border);color:var(--purple)}
+.card.blue .card-icon{background:var(--blue-bg);border:1px solid var(--blue-border);color:var(--blue)}
+.card-label{font-size:.7rem;color:var(--muted);margin-bottom:6px;font-weight:500}
+.card-val{font-size:1.45rem;font-weight:800;letter-spacing:-.02em;margin-bottom:3px}
+.card.red .card-val{color:var(--red)}
+.card.green .card-val{color:var(--green)}
+.card.purple .card-val{color:var(--purple)}
+.card.blue .card-val{color:var(--blue)}
+.card-sub{font-size:.68rem;color:var(--muted);line-height:1.4}
+
+/* Legend */
+.legend{display:flex;align-items:center;gap:16px;margin-bottom:12px;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;font-size:.75rem}
+.legend-item{display:flex;align-items:center;gap:6px;color:var(--muted2)}
+.legend-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.legend-dot.red{background:var(--red)}
+.legend-dot.green{background:var(--green)}
+
+/* Table toolbar */
+.toolbar{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.search-box{position:relative;flex:1;max-width:240px}
+.search-box svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;fill:none;stroke:var(--muted);stroke-width:2;stroke-linecap:round;pointer-events:none}
+.search-box input{width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:7px 12px 7px 32px;color:var(--text);font-size:.8rem;outline:none;transition:border-color .15s}
+.search-box input:focus{border-color:var(--accent)}
+.search-box input::placeholder{color:var(--muted)}
+.toolbar-btn{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:6px 12px;color:var(--muted2);font-size:.75rem;cursor:pointer;transition:all .15s}
+.toolbar-btn:hover{color:#fff;border-color:#4a5568}
+.toolbar-btn svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.row-count{font-size:.73rem;color:var(--muted);margin-left:auto}
+
+/* Table */
+.table-wrap{overflow-x:auto;border-radius:14px;border:1px solid var(--border);background:var(--surface)}
+table{width:100%;border-collapse:collapse;font-size:.78rem}
+thead tr{background:rgba(0,0,0,.2)}
+th{padding:10px 14px;color:var(--muted);font-weight:500;white-space:nowrap;border-bottom:1px solid var(--border);cursor:pointer;user-select:none;transition:color .15s}
+th:hover{color:var(--text);background:rgba(255,255,255,.02)}
+th.active{color:var(--accent)}
+th.right,td.right{text-align:right}
+th.left,td.left{text-align:left}
+th.center,td.center{text-align:center}
+.sort-arrow{margin-left:3px;font-size:.6rem;opacity:.35}
+th.active .sort-arrow{opacity:1;color:var(--accent)}
+td{padding:10px 14px;border-bottom:1px solid rgba(28,38,64,.5);transition:background .1s}
+tr:last-child td{border-bottom:none}
+tr.miss td{background:rgba(255,77,109,.03)}
+tr.miss:hover td{background:rgba(255,77,109,.07)}
+tr.good td{background:rgba(0,200,150,.03)}
+tr.good:hover td{background:rgba(0,200,150,.07)}
+tr.na:hover td{background:rgba(255,255,255,.02)}
+.sym{font-weight:700;color:#fff;font-size:.82rem}
+.sym-sub{font-size:.65rem;color:var(--amber);font-weight:500;display:block;margin-top:1px}
+.rv{color:var(--red);font-weight:600}
+.gv{color:var(--green);font-weight:600}
+.dim{color:var(--muted);font-size:.72rem}
+.date-cell{font-size:.72rem;color:var(--muted2);line-height:1.5}
+.date-label{font-size:.63rem;color:var(--muted);display:block}
+.pill{display:inline-block;border-radius:4px;padding:1px 6px;font-size:.65rem;font-weight:600}
+.pill.red{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border)}
+.pill.green{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
+.xb{background:none;border:none;color:var(--border2);cursor:pointer;padding:3px 5px;border-radius:5px;transition:all .15s;display:flex;align-items:center}
+.xb:hover{color:var(--red);background:var(--red-bg)}
+.xb svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round}
+.foot{text-align:right;font-size:.68rem;color:var(--muted);margin-top:10px}
+
+@media(max-width:768px){.cards{grid-template-columns:1fr 1fr}.insight-bar{grid-template-columns:1fr}}
+@media(max-width:500px){.fy-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+    </div>
+    <h1>What If I Held?</h1>
+  </div>
+  <span class="nav-chip">Zerodha Analyser</span>
+  <button id="resetBtn" onclick="doReset()">← New Analysis</button>
+</nav>
+
+<main>
+
+  <!-- ── UPLOAD SCREEN ── -->
+  <div id="uploadScreen">
+    <div class="hero">
+      <div class="hero-eyebrow">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        Zerodha Trade History Analyser
+      </div>
+      <h2>What are your sold stocks<br><span>worth today?</span></h2>
+      <p>Upload your tradebook files and instantly see how much money you left on the table — or saved.</p>
+    </div>
+
+    <div class="upload-card">
+      <!-- Current FY -->
+      <div class="section-label">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Current Financial Year
+      </div>
+      <div class="cur-fy-zone" id="curDrop"
+           onclick="document.getElementById('curInput').click()"
+           ondragover="dov(event,'curDrop')" ondragleave="dol('curDrop')" ondrop="dop(event)">
+        <input type="file" id="curInput" accept=".xlsx" onchange="curPick(this)"/>
+        <div class="fy-tag">FY 2025 – 26</div>
+        <div class="upload-icon" id="curIconWrap">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </div>
+        <h4 id="curLabel">Drop your FY 2025–26 tradebook here</h4>
+        <p>Click to browse &nbsp;·&nbsp; .xlsx files only &nbsp;·&nbsp; downloaded from Zerodha Console</p>
+      </div>
+
+      <div style="margin-top:20px">
+        <div class="section-label">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Past Financial Years &nbsp;<span style="font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0">— upload any years you have</span>
+        </div>
+        <div class="fy-grid" id="fyGrid"></div>
+        <div class="chips" id="chips"></div>
+      </div>
+    </div>
+
+    <div id="errorBox">
+      <svg style="width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;flex-shrink:0" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span id="errorMsg"></span>
+    </div>
+    <button id="analyseBtn" class="disabled" onclick="analyse()">Upload at least one tradebook to continue</button>
+  </div>
+
+  <!-- ── LOADING ── -->
+  <div id="loadingScreen">
+    <div class="spin-wrap"><div class="spin-bg"></div><div class="spin-ring"></div></div>
+    <h3>Fetching live prices</h3>
+    <p>Querying NSE via Yahoo Finance. This takes 15–30 seconds depending on how many stocks you traded.</p>
+  </div>
+
+  <!-- ── DASHBOARD ── -->
+  <div id="dashboard">
+
+    <!-- Best / Worst insight bar -->
+    <div class="insight-bar" id="insightBar"></div>
+
+    <!-- Summary cards -->
+    <div class="cards">
+      <div class="card red">
+        <div class="card-icon"><svg viewBox="0 0 24 24"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></svg></div>
+        <div class="card-label">Money Left on the Table</div>
+        <div class="card-val" id="cMissed">—</div>
+        <div class="card-sub">These stocks went UP after you sold</div>
+      </div>
+      <div class="card green">
+        <div class="card-icon"><svg viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div>
+        <div class="card-label">Money You Saved</div>
+        <div class="card-val" id="cSmart">—</div>
+        <div class="card-sub">These stocks went DOWN after you sold</div>
+      </div>
+      <div class="card purple">
+        <div class="card-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg></div>
+        <div class="card-label">Net If You Never Sold</div>
+        <div class="card-val" id="cNT">—</div>
+        <div class="card-sub">Left on Table minus Money Saved</div>
+      </div>
+      <div class="card blue">
+        <div class="card-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+        <div class="card-label">Stocks Checked</div>
+        <div class="card-val" id="cCount">—</div>
+        <div class="card-sub">Unique stocks you sold</div>
+      </div>
+    </div>
+
+    <!-- Legend + toolbar -->
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot red"></div>You sold too early — stock went UP after you sold</div>
+      <div class="legend-item"><div class="legend-dot green"></div>Good sell — stock went DOWN after you sold</div>
+    </div>
+
+    <div class="toolbar">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="searchBox" placeholder="Search stock…" oninput="renderTable()"/>
+      </div>
+      <button class="toolbar-btn" onclick="exportCSV()">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export CSV
+      </button>
+      <span class="row-count" id="rowCount"></span>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr id="thead"></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <p class="foot">Prices via Yahoo Finance (NSE) &nbsp;·&nbsp; Splits auto-adjusted &nbsp;·&nbsp; Last trading day close</p>
+  </div>
+
+</main>
+
+<script>
+// ── FY Setup ──────────────────────────────────────────────────────
+const PAST_FY=["2024-25","2023-24","2022-23","2021-22","2020-21","2019-20","2018-19","2017-18","2016-17","2015-16"];
+const fyFiles={};
+let curFile=null;
+
+function buildFYGrid(){
+  document.getElementById("fyGrid").innerHTML=PAST_FY.map(fy=>`
+    <div class="fy-card" id="fy_${fy}" onclick="document.getElementById('fyi_${fy}').click()">
+      <input type="file" accept=".xlsx" id="fyi_${fy}" onchange="fyPick('${fy}',this)"/>
+      <button class="fy-rm" onclick="fyRm(event,'${fy}')">✕</button>
+      <div class="fy-year">FY ${fy}</div>
+      <div class="fy-status" id="fys_${fy}">Click to upload</div>
+    </div>`).join("");
+}
+
+function fyPick(fy,el){
+  const f=el.files[0]; if(!f) return;
+  if(!f.name.toLowerCase().endsWith(".xlsx")){showErr("Only .xlsx files are supported.");return;}
+  fyFiles[fy]=f;
+  document.getElementById(`fy_${fy}`).classList.add("uploaded");
+  document.getElementById(`fys_${fy}`).textContent=f.name.length>15?f.name.slice(0,15)+"…":f.name;
+  renderChips(); updateBtn();
+}
+function fyRm(e,fy){
+  e.stopPropagation(); delete fyFiles[fy];
+  document.getElementById(`fy_${fy}`).classList.remove("uploaded");
+  document.getElementById(`fys_${fy}`).textContent="Click to upload";
+  document.getElementById(`fyi_${fy}`).value="";
+  renderChips(); updateBtn();
+}
+function curPick(el){
+  const f=el.files[0]; if(!f) return;
+  if(!f.name.toLowerCase().endsWith(".xlsx")){showErr("Only .xlsx files are supported.");return;}
+  setCurFile(f);
+}
+function setCurFile(f){
+  curFile=f;
+  document.getElementById("curDrop").classList.add("has");
+  document.getElementById("curIconWrap").innerHTML=`<svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><polyline points="20 6 9 17 4 12"/></svg>`;
+  document.getElementById("curLabel").textContent=f.name;
+  renderChips(); updateBtn();
+}
+function dov(e,id){e.preventDefault();document.getElementById(id).classList.add("drag")}
+function dol(id){document.getElementById(id).classList.remove("drag")}
+function dop(e){
+  e.preventDefault(); dol("curDrop");
+  const f=e.dataTransfer.files[0]; if(!f) return;
+  if(!f.name.toLowerCase().endsWith(".xlsx")){showErr("Only .xlsx files are supported.");return;}
+  setCurFile(f);
+}
+function renderChips(){
+  const items=[];
+  if(curFile) items.push(`<div class="chip">FY 2025-26: <strong>${curFile.name}</strong></div>`);
+  Object.entries(fyFiles).forEach(([fy,f])=>items.push(`<div class="chip">FY ${fy}: <strong>${f.name}</strong></div>`));
+  document.getElementById("chips").innerHTML=items.join("");
+}
+function updateBtn(){
+  const n=(curFile?1:0)+Object.keys(fyFiles).length;
+  const btn=document.getElementById("analyseBtn");
+  btn.className=n>0?"ready":"disabled";
+  btn.textContent=n>0?`Analyse ${n} File${n>1?"s":""}`:"Upload at least one tradebook to continue";
+}
+
+// ── Analyse ───────────────────────────────────────────────────────
+let allData=[], dismissed=new Set(), sortKey="gain_loss", sortDir=-1;
+
+async function analyse(){
+  const files=[]; if(curFile) files.push(curFile); Object.values(fyFiles).forEach(f=>files.push(f));
+  if(!files.length) return;
+  hideErr();
+  document.getElementById("uploadScreen").style.display="none";
+  document.getElementById("loadingScreen").style.display="flex";
+  const fd=new FormData(); files.forEach(f=>fd.append("tradebooks",f));
+  try{
+    const res=await fetch("/analyze",{method:"POST",body:fd});
+    const json=await res.json();
+    if(!res.ok) throw new Error(json.error||"Unknown error");
+    allData=json.data||[]; dismissed=new Set();
+    buildDashboard();
+  }catch(e){
+    document.getElementById("loadingScreen").style.display="none";
+    document.getElementById("uploadScreen").style.display="block";
+    showErr(e.message);
+  }
+}
+
+// ── Dashboard ─────────────────────────────────────────────────────
+const COLS=[
+  {k:"_x",            l:"",                       cls:"center",ns:true},
+  {k:"symbol",        l:"Stock",                  cls:"left"},
+  {k:"buy_date",      l:"First Bought",           cls:"left"},
+  {k:"sell_date",     l:"First Sold",             cls:"left"},
+  {k:"days_held",     l:"Days Held",              cls:"right"},
+  {k:"qty_sold",      l:"Shares Sold",            cls:"right"},
+  {k:"avg_buy_price", l:"Bought At",              cls:"right"},
+  {k:"avg_sell_price",l:"Sold At",                cls:"right"},
+  {k:"current_price", l:"Price Today",            cls:"right"},
+  {k:"sell_value",    l:"Money Received",         cls:"right"},
+  {k:"whatif_value",  l:"Worth Today If Kept",    cls:"right"},
+  {k:"gain_loss",     l:"Profit / Loss",          cls:"right"},
+  {k:"gain_loss_pct", l:"%",                      cls:"right"},
+];
+
+function buildDashboard(){
+  document.getElementById("loadingScreen").style.display="none";
+  document.getElementById("dashboard").style.display="block";
+  document.getElementById("resetBtn").style.display="inline";
+  updateCards();
+  buildInsights();
+  buildHead();
+  renderTable();
+}
+
+function updateCards(){
+  const vis=allData.filter(r=>!dismissed.has(r.symbol));
+  const missed=vis.filter(r=>r.gain_loss>0).reduce((s,r)=>s+r.gain_loss,0);
+  const saved =vis.filter(r=>r.gain_loss<0).reduce((s,r)=>s+Math.abs(r.gain_loss),0);
+  const net   =missed-saved;
+  document.getElementById("cMissed").textContent=inr(missed);
+  document.getElementById("cSmart").textContent=inr(saved);
+  document.getElementById("cNT").textContent=(net>=0?"+":"-")+inr(Math.abs(net));
+  document.getElementById("cCount").textContent=vis.length;
+}
+
+function buildInsights(){
+  const vis=allData.filter(r=>r.gain_loss!=null);
+  if(!vis.length){ document.getElementById("insightBar").style.display="none"; return; }
+  const worst=vis.reduce((a,b)=>b.gain_loss>a.gain_loss?b:a);
+  const best =vis.reduce((a,b)=>b.gain_loss<a.gain_loss?b:a);
+  document.getElementById("insightBar").innerHTML=`
+    <div class="insight">
+      <div class="insight-icon red"><svg viewBox="0 0 24 24"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></svg></div>
+      <div>
+        <div class="insight-label">Biggest missed opportunity</div>
+        <div class="insight-val">${worst.symbol} &nbsp;<span style="color:var(--red)">+${inr(worst.gain_loss)}</span></div>
+        <div class="insight-sub">Sold at ${inr(worst.avg_sell_price)} · worth ${inr(worst.current_price)} today</div>
+      </div>
+    </div>
+    <div class="insight">
+      <div class="insight-icon green"><svg viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div>
+      <div>
+        <div class="insight-label">Best sell decision</div>
+        <div class="insight-val">${best.symbol} &nbsp;<span style="color:var(--green)">${inr(best.gain_loss)}</span></div>
+        <div class="insight-sub">Sold at ${inr(best.avg_sell_price)} · worth ${inr(best.current_price)} today</div>
+      </div>
+    </div>`;
+}
+
+function buildHead(){
+  document.getElementById("thead").innerHTML=COLS.map(c=>`
+    <th class="${c.cls}${sortKey===c.k?" active":""}" ${c.ns?"":`onclick="doSort('${c.k}')"`}>
+      ${c.l}${c.ns?"":`<span class="sort-arrow">${sortKey===c.k?(sortDir===1?"▲":"▼"):"⇅"}</span>`}
+    </th>`).join("");
+}
+
+function doSort(k){
+  if(sortKey===k) sortDir*=-1; else{sortKey=k;sortDir=-1;}
+  buildHead(); renderTable();
+}
+
+function renderTable(){
+  const q=document.getElementById("searchBox").value.trim().toLowerCase();
+  let rows=allData.filter(r=>!dismissed.has(r.symbol)&&r.symbol.toLowerCase().includes(q));
+  rows.sort((a,b)=>{
+    let av=a[sortKey],bv=b[sortKey];
+    if(av==null&&bv==null)return 0; if(av==null)return 1; if(bv==null)return -1;
+    return(typeof av==="string"?av.localeCompare(bv):av-bv)*sortDir;
+  });
+  const total=allData.filter(r=>!dismissed.has(r.symbol)).length;
+  document.getElementById("rowCount").textContent=`${rows.length} of ${total} stocks`;
+  document.getElementById("tbody").innerHTML=rows.map(r=>{
+    const gl=r.gain_loss, cls=gl==null?"na":gl>0?"miss":"good";
+    const glSign=gl>0?"+":"";
+    return `<tr class="${cls}">
+      <td class="center"><button class="xb" title="Remove row" onclick="dismiss('${r.symbol}')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></td>
+      <td class="left">
+        <span class="sym">${r.symbol}</span>
+        ${r.split_ratio>1?`<span class="sym-sub">${r.split_ratio}x stock split</span>`:""}
+      </td>
+      <td class="left">
+        <div class="date-cell"><span class="date-label">Bought</span>${r.buy_date}</div>
+      </td>
+      <td class="left">
+        <div class="date-cell"><span class="date-label">Sold</span>${r.sell_date}</div>
+      </td>
+      <td class="right"><span class="dim">${r.days_held!=null?r.days_held+" days":"—"}</span></td>
+      <td class="right">${fmt(r.qty_sold)}${r.split_ratio>1?`<br><span class="dim">→ ${fmt(r.adj_qty)} adj</span>`:""}
+      </td>
+      <td class="right dim">${inr(r.avg_buy_price)}</td>
+      <td class="right dim">${inr(r.avg_sell_price)}</td>
+      <td class="right">${r.current_price==null?`<span class="dim">N/A</span>`:inr(r.current_price)}</td>
+      <td class="right">${inr(r.sell_value)}</td>
+      <td class="right">${inr(r.whatif_value)}</td>
+      <td class="right">${gl==null?`<span class="dim">N/A</span>`:`<span class="${gl>0?"rv":"gv"}">${glSign}${inr(gl)}</span>`}</td>
+      <td class="right">${r.gain_loss_pct==null?`<span class="dim">N/A</span>`:`<span class="pill ${r.gain_loss_pct>0?"red":"green"}">${r.gain_loss_pct>0?"+":""}${r.gain_loss_pct.toFixed(1)}%</span>`}</td>
+    </tr>`;
+  }).join("");
+}
+
+function dismiss(sym){ dismissed.add(sym); updateCards(); buildInsights(); renderTable(); }
+
+// ── Export CSV ────────────────────────────────────────────────────
+function exportCSV(){
+  const vis=allData.filter(r=>!dismissed.has(r.symbol));
+  const headers=["Stock","First Bought","First Sold","Days Held","Shares Sold","Bought At","Sold At","Price Today","Money Received","Worth Today If Kept","Profit/Loss","Profit/Loss %"];
+  const rows=vis.map(r=>[
+    r.symbol, r.buy_date, r.sell_date, r.days_held??"",
+    r.qty_sold, r.avg_buy_price, r.avg_sell_price,
+    r.current_price??"N/A", r.sell_value,
+    r.whatif_value??"N/A", r.gain_loss??"N/A",
+    r.gain_loss_pct!=null?r.gain_loss_pct.toFixed(2)+"%":"N/A"
+  ]);
+  const csv=[headers,...rows].map(r=>r.map(v=>`"${v}"`).join(",")).join("\n");
+  const a=document.createElement("a");
+  a.href="data:text/csv;charset=utf-8,"+encodeURIComponent(csv);
+  a.download="whatifiheld_export.csv"; a.click();
+}
+
+// ── Helpers ───────────────────────────────────────────────────────
+function inr(n){
+  if(n==null) return "N/A";
+  return "₹"+new Intl.NumberFormat("en-IN",{maximumFractionDigits:2}).format(n);
+}
+function fmt(n){ return new Intl.NumberFormat("en-IN").format(n); }
+function showErr(m){
+  const b=document.getElementById("errorBox"); b.style.display="flex";
+  document.getElementById("errorMsg").textContent=m;
+}
+function hideErr(){ document.getElementById("errorBox").style.display="none"; }
+function doReset(){
+  curFile=null; Object.keys(fyFiles).forEach(k=>delete fyFiles[k]);
+  allData=[]; dismissed=new Set();
+  document.getElementById("curDrop").classList.remove("has");
+  document.getElementById("curIconWrap").innerHTML=`<svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>`;
+  document.getElementById("curLabel").textContent="Drop your FY 2025–26 tradebook here";
+  document.getElementById("curInput").value="";
+  document.getElementById("dashboard").style.display="none";
+  document.getElementById("loadingScreen").style.display="none";
+  document.getElementById("uploadScreen").style.display="block";
+  document.getElementById("resetBtn").style.display="none";
+  document.getElementById("searchBox").value="";
+  hideErr(); buildFYGrid(); renderChips(); updateBtn();
+}
+
+buildFYGrid();
+</script>
+</body>
+</html>
