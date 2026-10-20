@@ -55,7 +55,7 @@ This is an independent personal developer project. It is not affiliated with, en
 
 ## Project status
 
-This is an early-stage personal developer project, started in March 2026. Planned improvements include a clearer interface, automated tests, and deployment instructions.
+This is an early-stage developer project, started in March 2026. Planned improvements include a clearer interface, automated tests, and deployment instructions.
 
 ## License
 
